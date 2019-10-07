@@ -84,6 +84,26 @@ def add_phonebook_entity():
         response = Response(json.dumps(invalid_phonebook_object_error_message), 400, mimetype='application/json')
         return (response)
 
+#PUT /phonebook/<phonenumber>
+@app.route('/phonebook/<int:phone_number>', methods = ['PUT'])
+def replace_phonebook_entity(phone_number):
+    request_data = request.get_json()
+    new_phonebook_entity = {
+        'name': request_data['name'],
+        'last_name': request_data['last_name'],
+        'phonenumber': phone_number,
+        'email': request_data['email'],
+        'birthday': request_data['birthday'],
+        'country': request_data['country'],
+        'city': request_data['city']
+    }
+    i = 0
+    for phonebook_entity in phonebook_entities:
+        current_phonenumber = phonebook_entity["phonenumber"]
+        if current_phonenumber == phone_number:
+            phonebook_entities[i] = new_phonebook_entity
+        i += 1
+    response = Response("", 204)
 
 
 if __name__ == "__main__":
