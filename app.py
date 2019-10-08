@@ -106,6 +106,13 @@ def replace_phonebook_entity(phone_number):
     response = Response("", 204)
     return response
 
+#PATCH /phonebook/<phonenumber>
+@app.route('/phonebook/<int:phone_number>')
+def update_phonebook_entity(phone_number):
+    request_data = request.get_json()
+    updated_phonebook_entity = {}
+    
+
 
 if __name__ == "__main__":
     app.run(port=5000)
