@@ -104,6 +104,7 @@ def replace_phonebook_entity(phone_number):
             phonebook_entities[i] = new_phonebook_entity
         i += 1
     response = Response("", 204)
+    return response
 
 
 if __name__ == "__main__":
