@@ -107,12 +107,29 @@ def replace_phonebook_entity(phone_number):
     return response
 
 #PATCH /phonebook/<phonenumber>
-@app.route('/phonebook/<int:phone_number>')
+@app.route('/phonebook/<int:phone_number>', methods = ["PATCH"])
 def update_phonebook_entity(phone_number):
     request_data = request.get_json()
     updated_phonebook_entity = {}
-    
+    if("name" in request_data):
+        updated_phonebook_entity["name"] = request_data["name"]
+    if ("last_name" in request_data):
+        updated_phonebook_entity["last_name"] = request_data["last_name"]
+    if ("email" in request_data):
+        updated_phonebook_entity["email"] = request_data["email"]
+    if ("birthday" in request_data):
+        updated_phonebook_entity["birthday"] = request_data["birthday"]
+    if ("country" in request_data):
+        updated_phonebook_entity["country"] = request_data["country"]
+    if ("city" in request_data):
+        updated_phonebook_entity["city"] = request_data["city"]
 
+    for phonebook_entity in phonebook_entities:
+        if phonebook_entity["phonenumber"] == phone_number:
+            phonebook_entity.update(updated_phonebook_entity)
+    response = Response("", 204)
+    response.headers['Location'] = str(phone_number)
+    return response
 
 if __name__ == "__main__":
     app.run(port=5000)
