@@ -131,6 +131,11 @@ def update_phonebook_entity(phone_number):
     response.headers['Location'] = str(phone_number)
     return response
 
+#DELETE /phonebook/<phonenumber>
+@app.route('phonebook/<int:phonee_number>', methods = ["DELETE"])
+def delete_phonebook_entity(phone_number):
+    pass
+
 if __name__ == "__main__":
     app.run(port=5000)
 
