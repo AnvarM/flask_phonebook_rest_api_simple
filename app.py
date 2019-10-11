@@ -134,7 +134,9 @@ def update_phonebook_entity(phone_number):
 #DELETE /phonebook/<phonenumber>
 @app.route('phonebook/<int:phonee_number>', methods = ["DELETE"])
 def delete_phonebook_entity(phone_number):
-    pass
+    for phonebook_entity in phonebook_entities:
+        if phonebook_entity["phone_number"] == phone_number:
+            return jsonify(phonebook_entity)
 
 if __name__ == "__main__":
     app.run(port=5000)
