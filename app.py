@@ -1,29 +1,9 @@
 from flask import Flask, jsonify, request, Response
+from phonebook_ent import phonebook_entities
 import json
 
 app = Flask(__name__)
 print(__name__)
-
-phonebook_entities = [
-    {
-        'name' : 'Redrik',
-        'last_name' : 'Shuhart',
-        'phonenumber' : 12311111111,
-        'email' : 'redrik.shuhart@harmont.rp',
-        'birthday' : '19.01.1931',
-        'country' : 'Canada',
-        'city' : 'Harmont'
-    },
-    {
-        'name': 'Richard',
-        'last_name': 'Nunan',
-        'phonenumber': 12311231611,
-        'email': 'richard.nunan@harmont.rp',
-        'birthday': '15.04.1918',
-        'country': 'Canada',
-        'city': 'Harmont'
-    }
-]
 
 def valid_phonebook_entity(phonebook_entity):
     if (
@@ -132,11 +112,22 @@ def update_phonebook_entity(phone_number):
     return response
 
 #DELETE /phonebook/<phonenumber>
-@app.route('phonebook/<int:phonee_number>', methods = ["DELETE"])
+@app.route('/phonebook/<int:phone_number>', methods = ["DELETE"])
 def delete_phonebook_entity(phone_number):
+    i = 0
+    deleted_count = 0
     for phonebook_entity in phonebook_entities:
-        if phonebook_entity["phone_number"] == phone_number:
-            return jsonify(phonebook_entity)
+        if phonebook_entity["phonenumber"] == phone_number:
+            phonebook_entities.pop(i)
+            response = Response("", status = 204)
+            deleted_count += 1
+        i += 1
+    invalid_phonebook_object_error_message = {
+        "error": "Phonebook entity that was provided was not found, so therefore unable to delete"
+    }
+    if deleted_count == 0:
+        response = Response(json.dumps(invalid_phonebook_object_error_message), status = 404, mimetype = 'application/json')
+    return response;
 
 if __name__ == "__main__":
     app.run(port=5000)
