@@ -1,42 +1,18 @@
 from flask import Flask, jsonify, request, Response
-from phonebook_ent import phonebook_entities
 import json
-
-app = Flask(__name__)
-print(__name__)
-
-def valid_phonebook_entity(phonebook_entity):
-    if (
-        "name" in phonebook_entity and
-        "last_name" in phonebook_entity and
-        "phonenumber" in phonebook_entity and
-        "birthday" in phonebook_entity and
-        "country" in phonebook_entity and
-        'city' in phonebook_entity):
-        return True
-    else:
-        return False
+from settings import *
+from PhonebookModel import *
+from test import valid_phonebook_entity
 
 #GET /phonebook
 @app.route('/phonebook')
 def get_all_phonebook_entities():
-    return jsonify({'phonebook' : phonebook_entities})
+    return jsonify({'phonebook' : Phonebook.get_all_records()})
 
 #GET /phonebook/<phone_number>
 @app.route('/phonebook/<int:phone_number>')
 def get_phonebook_entity(phone_number):
-    return_value = {}
-    for phonebook_entity in phonebook_entities:
-        if phonebook_entity['phonenumber'] == phone_number:
-            return_value = {
-                'name': phonebook_entity['name'],
-                'last_name': phonebook_entity['last_name'],
-                'phonenumber': phonebook_entity['phonenumber'],
-                'email': phonebook_entity['email'],
-                'birthday': phonebook_entity['birthday'],
-                'country': phonebook_entity['country'],
-                'city': phonebook_entity['city']
-            }
+    return_value = Phonebook.get_record(phone_number)
     return jsonify(return_value)
 
 #POST /phonebook
@@ -44,18 +20,15 @@ def get_phonebook_entity(phone_number):
 def add_phonebook_entity():
     request_data = request.get_json()
     if(valid_phonebook_entity(request_data)):
-        new_phonebook_entity = {
-            'name': request_data['name'],
-            'last_name': request_data['last_name'],
-            'phonenumber': request_data['phonenumber'],
-            'email': request_data['email'],
-            'birthday': request_data['birthday'],
-            'country': request_data['country'],
-            'city': request_data['city']
-        }
-        phonebook_entities.insert(0, new_phonebook_entity)
+        Phonebook.add_record(request_data['name'],
+                             request_data['last_name'],
+                             request_data['phonenumber'],
+                             request_data['email'],
+                             request_data['birthday'],
+                             request_data['country'],
+                             request_data['city'])
         response = Response("", 201, mimetype='application/json')
-        response.headers['Location'] = "/phonebook/" + str(new_phonebook_entity['phonenumber'])
+        response.headers['Location'] = "/phonebook/" + str(request_data['phonenumber'])
         return response
     else:
         invalid_phonebook_object_error_message = {
@@ -68,21 +41,13 @@ def add_phonebook_entity():
 @app.route('/phonebook/<int:phone_number>', methods = ['PUT'])
 def replace_phonebook_entity(phone_number):
     request_data = request.get_json()
-    new_phonebook_entity = {
-        'name': request_data['name'],
-        'last_name': request_data['last_name'],
-        'phonenumber': phone_number,
-        'email': request_data['email'],
-        'birthday': request_data['birthday'],
-        'country': request_data['country'],
-        'city': request_data['city']
-    }
-    i = 0
-    for phonebook_entity in phonebook_entities:
-        current_phonenumber = phonebook_entity["phonenumber"]
-        if current_phonenumber == phone_number:
-            phonebook_entities[i] = new_phonebook_entity
-        i += 1
+    Phonebook.replace_record(phone_number,
+                             request_data['name'],
+                             request_data['last_name'],
+                             request_data['email'],
+                             request_data['birthday'],
+                             request_data['country'],
+                             request_data['city'])
     response = Response("", 204)
     return response
 
@@ -92,21 +57,18 @@ def update_phonebook_entity(phone_number):
     request_data = request.get_json()
     updated_phonebook_entity = {}
     if("name" in request_data):
-        updated_phonebook_entity["name"] = request_data["name"]
+        Phonebook.update_record_name(phone_number, request_data['name'])
     if ("last_name" in request_data):
-        updated_phonebook_entity["last_name"] = request_data["last_name"]
+        Phonebook.update_record_last_name(phone_number, request_data['last_name'])
     if ("email" in request_data):
-        updated_phonebook_entity["email"] = request_data["email"]
+        Phonebook.update_record_email(phone_number, request_data['email'])
     if ("birthday" in request_data):
-        updated_phonebook_entity["birthday"] = request_data["birthday"]
+        Phonebook.update_record_birthday(phone_number, request_data['birthday'])
     if ("country" in request_data):
-        updated_phonebook_entity["country"] = request_data["country"]
+        Phonebook.update_record_country(phone_number, request_data['country'])
     if ("city" in request_data):
-        updated_phonebook_entity["city"] = request_data["city"]
+        Phonebook.update_record_city(phone_number, request_data['city'])
 
-    for phonebook_entity in phonebook_entities:
-        if phonebook_entity["phonenumber"] == phone_number:
-            phonebook_entity.update(updated_phonebook_entity)
     response = Response("", 204)
     response.headers['Location'] = str(phone_number)
     return response
@@ -114,19 +76,13 @@ def update_phonebook_entity(phone_number):
 #DELETE /phonebook/<phonenumber>
 @app.route('/phonebook/<int:phone_number>', methods = ["DELETE"])
 def delete_phonebook_entity(phone_number):
-    i = 0
-    deleted_count = 0
-    for phonebook_entity in phonebook_entities:
-        if phonebook_entity["phonenumber"] == phone_number:
-            phonebook_entities.pop(i)
-            response = Response("", status = 204)
-            deleted_count += 1
-        i += 1
+    if Phonebook.delete_record(phone_number):
+        response = Response("", status = 204)
+        return response
     invalid_phonebook_object_error_message = {
         "error": "Phonebook entity that was provided was not found, so therefore unable to delete"
     }
-    if deleted_count == 0:
-        response = Response(json.dumps(invalid_phonebook_object_error_message), status = 404, mimetype = 'application/json')
+    response = Response(json.dumps(invalid_phonebook_object_error_message), status = 404, mimetype = 'application/json')
     return response;
 
 if __name__ == "__main__":

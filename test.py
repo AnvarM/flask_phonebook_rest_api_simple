@@ -1,4 +1,14 @@
-from app import valid_phonebook_entity
+def valid_phonebook_entity(phonebook_entity):
+    if (
+        "name" in phonebook_entity and
+        "last_name" in phonebook_entity and
+        "phonenumber" in phonebook_entity and
+        "birthday" in phonebook_entity and
+        "country" in phonebook_entity and
+        'city' in phonebook_entity):
+        return True
+    else:
+        return False
 
 valid_entity = {"name" : "Guta",
 		"last_name" : "Shuhart",
