@@ -3,10 +3,23 @@ import json
 from settings import *
 from PhonebookModel import *
 from test import valid_phonebook_entity
+import jwt
+import datetime
+
+@app.route('/login')
+def get_token():
+    expiration_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=100)
+    token = jwt.encode({'exp' : expiration_date}, app.config['SECRET_KEY'], algorithm = 'HS256')
+    return token
 
 #GET /phonebook
 @app.route('/phonebook')
 def get_all_phonebook_entities():
+    token = request.args.get('token')
+    try:
+        jwt.decode(token, app.config['SECRET_KEY'])
+    except:
+        return jsonify({'error' : 'Provide a valid token to view this page'}), 401
     return jsonify({'phonebook' : Phonebook.get_all_records()})
 
 #GET /phonebook/<phone_number>
@@ -50,6 +63,8 @@ def replace_phonebook_entity(phone_number):
                              request_data['city'])
     response = Response("", 204)
     return response
+
+
 
 #PATCH /phonebook/<phonenumber>
 @app.route('/phonebook/<int:phone_number>', methods = ["PATCH"])
