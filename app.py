@@ -6,6 +6,20 @@ from test import valid_phonebook_entity
 import jwt
 import datetime
 from UserModel import User
+from functools import wraps
+
+
+def token_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        token = request.args.get('token')
+        try:
+            jwt.decode(token, app.config['SECRET_KEY'])
+            return f(*args, **kwargs)
+        except:
+            return jsonify({'error': 'Provide a valid token to view this page'}), 401
+    return wrapper
+
 
 @app.route('/login', methods = ['POST'])
 def get_token():
@@ -26,11 +40,6 @@ def get_token():
 #GET /phonebook
 @app.route('/phonebook')
 def get_all_phonebook_entities():
-    token = request.args.get('token')
-    try:
-        jwt.decode(token, app.config['SECRET_KEY'])
-    except:
-        return jsonify({'error' : 'Provide a valid token to view this page'}), 401
     return jsonify({'phonebook' : Phonebook.get_all_records()})
 
 #GET /phonebook/<phone_number>
@@ -41,6 +50,7 @@ def get_phonebook_entity(phone_number):
 
 #POST /phonebook
 @app.route('/phonebook', methods = ['POST'])
+@token_required
 def add_phonebook_entity():
     request_data = request.get_json()
     if(valid_phonebook_entity(request_data)):
@@ -63,6 +73,7 @@ def add_phonebook_entity():
 
 #PUT /phonebook/<phonenumber>
 @app.route('/phonebook/<int:phone_number>', methods = ['PUT'])
+@token_required
 def replace_phonebook_entity(phone_number):
     request_data = request.get_json()
     Phonebook.replace_record(phone_number,
@@ -79,6 +90,7 @@ def replace_phonebook_entity(phone_number):
 
 #PATCH /phonebook/<phonenumber>
 @app.route('/phonebook/<int:phone_number>', methods = ["PATCH"])
+@token_required
 def update_phonebook_entity(phone_number):
     request_data = request.get_json()
     updated_phonebook_entity = {}
@@ -101,6 +113,7 @@ def update_phonebook_entity(phone_number):
 
 #DELETE /phonebook/<phonenumber>
 @app.route('/phonebook/<int:phone_number>', methods = ["DELETE"])
+@token_required
 def delete_phonebook_entity(phone_number):
     if Phonebook.delete_record(phone_number):
         response = Response("", status = 204)
