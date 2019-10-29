@@ -75,5 +75,5 @@ assert valid_phonebook_entity(missing_last_name) == False, "Should be False"
 assert valid_phonebook_entity(missing_email) == True, "Should be True"
 assert valid_phonebook_entity(missing_birthday) == False, "Should be False"
 assert valid_phonebook_entity(missing_country) == False, "Should be False"
-assert valid_phonebook_entity(missing_city) == True, "Should be True"
+assert valid_phonebook_entity(missing_city) == False, "Should be False"
 
