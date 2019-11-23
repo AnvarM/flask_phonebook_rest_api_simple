@@ -71,7 +71,7 @@ missing_city = {"name" : "Guta",
 
 assert valid_phonebook_entity(valid_entity) == True, "Should be True"
 assert valid_phonebook_entity(missing_name) == False, "Should be False"
-assert valid_phonebook_entity(missing_last_name) == False, "Should be False"
+assert valid_phonebook_entity(missing_last_name) == True, "Should be True"
 assert valid_phonebook_entity(missing_email) == True, "Should be True"
 assert valid_phonebook_entity(missing_birthday) == True, "Should be True"
 assert valid_phonebook_entity(missing_birthday) == True, "Should be True"
