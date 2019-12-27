@@ -78,8 +78,3 @@ assert valid_phonebook_entity(missing_email) == True, "Should be True"
 assert valid_phonebook_entity(missing_birthday) == True, "Should be True"
 assert valid_phonebook_entity(missing_country) == True, "Should be True"
 assert valid_phonebook_entity(missing_city) == True, "Should be True"
-assert valid_phonebook_entity(missing_city) == True, "Should be True"
-assert valid_phonebook_entity(missing_city) == True, "Should be True"
-
-
-
