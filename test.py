@@ -80,7 +80,6 @@ assert valid_phonebook_entity(missing_country) == True, "Should be True"
 assert valid_phonebook_entity(missing_city) == True, "Should be True"
 assert('Happy new 2021 year!!!', True)
 assert('Happy new 2021 year!!!', True)
-assert('Happy new 2021 year!!!', True)
 
 
 
